@@ -65,6 +65,8 @@ final class AgentCheck
                 $hasErrors = true;
             }
         }
-        $report->status = $hasErrors ? \Brzuchal\PhpAgentCheck\Domain\ToolStatus::Failed : \Brzuchal\PhpAgentCheck\Domain\ToolStatus::Passed;
+        $report->status = $hasErrors ?
+            \Brzuchal\PhpAgentCheck\Domain\ToolStatus::Failed :
+            \Brzuchal\PhpAgentCheck\Domain\ToolStatus::Passed;
     }
 }

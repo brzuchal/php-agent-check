@@ -27,7 +27,8 @@ final class PhpCsJsonParser
                         type: 'execution_error',
                         tool: 'phpcs',
                         severity: Severity::Error,
-                        message: "Failed to parse JSON output. Exit code: {$result->exitCode}\nOutput: " . mb_substr($result->stdout, 0, 100)
+                        message: "Failed to parse JSON output. "
+                            . "Exit code: {$result->exitCode}\nOutput: " . mb_substr($result->stdout, 0, 100)
                     )
                 ]
             );
@@ -40,7 +41,7 @@ final class PhpCsJsonParser
             $messages = $fileData['messages'] ?? [];
             foreach ($messages as $msg) {
                 $severity = ($msg['type'] ?? '') === 'WARNING' ? Severity::Warning : Severity::Error;
-                
+
                 $issues[] = new Issue(
                     type: 'coding_standard',
                     tool: 'phpcs',

@@ -27,7 +27,8 @@ final class PhpStanJsonParser
                         type: 'execution_error',
                         tool: 'phpstan',
                         severity: Severity::Error,
-                        message: "Failed to parse JSON output. Exit code: {$result->exitCode}\nOutput: {$result->stdout}"
+                        message: "Failed to parse JSON output. "
+                            . "Exit code: {$result->exitCode}\nOutput: {$result->stdout}"
                     )
                 ]
             );

@@ -17,14 +17,14 @@ final class SymfonyProcessRunner implements ProcessRunner
     public function run(CheckExecution $execution): CheckExecutionResult
     {
         $env = array_merge($execution->environmentVariables, ['AGENTCHK' => '1']);
-        
+
         $process = new Process(
             $execution->command,
             $execution->workingDirectory,
             $env
         );
         $process->setTimeout($execution->timeout);
-        
+
         if ($this->output && $this->output->isVerbose()) {
             $this->output->writeln('<info>[ProcessRunner] Executing:</info> ' . $process->getCommandLine());
             $this->output->writeln('<info>[ProcessRunner] Working Directory:</info> ' . $execution->workingDirectory);
