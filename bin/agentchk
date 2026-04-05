@@ -62,7 +62,7 @@ $checks = [
 
 $agentCheck = new AgentCheck(
     new YamlConfigurationLoader(),
-    new SymfonyProcessRunner(),
+    new SymfonyProcessRunner($output),
     $checks,
     $reporters
 );
