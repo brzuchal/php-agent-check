@@ -1,7 +1,7 @@
 {
     "name": "brzuchal/php-agent-check",
     "description": "Unified, machine-oriented validation runner for PHP projects",
-    "type": "library",
+    "type": "project",
     "require": {
         "php": "^8.1",
         "symfony/console": "^6.0 || ^7.0",
