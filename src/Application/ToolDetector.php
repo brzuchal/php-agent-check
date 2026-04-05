@@ -8,5 +8,5 @@ interface ToolDetector
 {
     public function name(): string;
 
-    public function detect(string $workingDirectory): ?ToolConfig;
+    public function detect(string $workingDirectory, ?ComposerProject $composerProject = null): ?ToolConfig;
 }

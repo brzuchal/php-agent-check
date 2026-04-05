@@ -2,6 +2,7 @@
 
 namespace Brzuchal\PhpAgentCheck\UserInterface\Cli;
 
+use Brzuchal\PhpAgentCheck\Application\ComposerProject;
 use Brzuchal\PhpAgentCheck\Application\ToolDetector;
 use Brzuchal\PhpAgentCheck\Domain\ProfileDefinition;
 use Brzuchal\PhpAgentCheck\Domain\ProjectConfiguration;
@@ -41,9 +42,10 @@ final class InitCommand extends Command
 
         $tools = [];
         $profileTools = [];
+        $composerProject = new ComposerProject($workingDir);
 
         foreach ($this->detectors as $detector) {
-            $toolConfig = $detector->detect($workingDir);
+            $toolConfig = $detector->detect($workingDir, $composerProject);
             if ($toolConfig !== null) {
                 $tools[$detector->name()] = $toolConfig;
                 $profileTools[] = $detector->name();

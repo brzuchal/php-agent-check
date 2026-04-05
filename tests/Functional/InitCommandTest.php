@@ -33,6 +33,39 @@ class InitCommandTest extends TestCase
         $this->fs->remove($this->tempDir);
     }
 
+    public function testInitDetectsToolsFromComposerJson(): void
+    {
+        $composerJson = [
+            'config' => ['bin-dir' => 'custom-bin'],
+            'require-dev' => [
+                'phpunit/phpunit' => '^10.0',
+                'phpstan/phpstan' => '^1.0',
+            ],
+        ];
+        $this->fs->dumpFile($this->tempDir . '/composer.json', json_encode($composerJson));
+
+        $command = new InitCommand($this->detectors);
+        $tester = new CommandTester($command);
+
+        $oldCwd = getcwd();
+        chdir($this->tempDir);
+
+        try {
+            $tester->execute([]);
+
+            $this->assertEquals(0, $tester->getStatusCode());
+            $this->assertStringContainsString("Created 'agentchk.yaml' with detected tools: phpunit, phpstan", $tester->getDisplay());
+            $this->assertFileExists($this->tempDir . '/agentchk.yaml');
+
+            $config = file_get_contents($this->tempDir . '/agentchk.yaml');
+            $this->assertStringContainsString('custom-bin/phpunit', $config);
+            $this->assertStringContainsString('custom-bin/phpstan', $config);
+            $this->assertStringNotContainsString('phpcs', $config);
+        } finally {
+            chdir($oldCwd);
+        }
+    }
+
     public function testInitDetectsTools(): void
     {
         // Fixture: create config files for tools

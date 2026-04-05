@@ -2,6 +2,7 @@
 
 namespace Brzuchal\PhpAgentCheck\Tool\PhpUnit;
 
+use Brzuchal\PhpAgentCheck\Application\ComposerProject;
 use Brzuchal\PhpAgentCheck\Application\ToolDetector;
 use Brzuchal\PhpAgentCheck\Domain\ToolConfig;
 
@@ -12,18 +13,21 @@ final class PhpUnitDetector implements ToolDetector
         return 'phpunit';
     }
 
-    public function detect(string $workingDirectory): ?ToolConfig
+    public function detect(string $workingDirectory, ?ComposerProject $composerProject = null): ?ToolConfig
     {
         $hasXml = file_exists($workingDirectory . DIRECTORY_SEPARATOR . 'phpunit.xml')
             || file_exists($workingDirectory . DIRECTORY_SEPARATOR . 'phpunit.xml.dist');
+        $hasPackage = $composerProject?->hasPackage('phpunit/phpunit') ?? false;
 
-        if (!$hasXml) {
+        if (!$hasXml && !$hasPackage) {
             return null;
         }
 
+        $binDir = $composerProject?->getBinDir() ?? 'vendor/bin';
+
         return new ToolConfig(
             name: $this->name(),
-            command: ['vendor/bin/phpunit'],
+            command: [$binDir . DIRECTORY_SEPARATOR . 'phpunit'],
             args: ['--log-junit', 'var/agentchk/phpunit.junit.xml', '--no-progress']
         );
     }
