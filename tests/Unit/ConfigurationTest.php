@@ -9,7 +9,7 @@ class ConfigurationTest extends TestCase
 {
     public function testLoadsConfiguration(): void
     {
-        $config = new Configuration(__DIR__ . '/../agentchk.yaml');
+        $config = new Configuration(__DIR__ . '/../../agentchk.yaml');
         $config->load();
 
         $profile = $config->getProfile('fast');

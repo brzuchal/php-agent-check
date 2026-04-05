@@ -9,10 +9,10 @@ class Issue implements \JsonSerializable
         public readonly string $tool,
         public readonly Severity $severity,
         public readonly string $message,
-        public readonly ?string $file = null,
-        public readonly ?int $line = null,
-        public readonly ?string $test = null,
-        public readonly ?string $code = null
+        public readonly string|null $file = null,
+        public readonly int|null $line = null,
+        public readonly string|null $test = null,
+        public readonly string|null $code = null
     ) {
     }
 
