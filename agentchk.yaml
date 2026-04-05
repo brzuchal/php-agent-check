@@ -1,0 +1,36 @@
+profiles:
+  fast:
+    tools:
+      - phpunit
+
+  full:
+    tools:
+      - phpunit
+      - phpstan
+      - phpcs
+
+  agent:
+    tools:
+      - phpunit
+      - phpstan
+
+tools:
+  phpunit:
+    command: ["vendor/bin/phpunit"]
+    args:
+      - "--log-junit"
+      - "var/agentchk/phpunit.junit.xml"
+      - "--no-progress"
+
+  phpstan:
+    command: ["vendor/bin/phpstan"]
+    args:
+      - "analyse"
+      - "--error-format=json"
+
+  phpcs:
+    command: ["vendor/bin/phpcs"]
+    args:
+      - "--report=json"
+      - "src"
+      - "tests"
