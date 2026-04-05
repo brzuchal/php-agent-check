@@ -21,14 +21,14 @@ final class PhpCsCheck implements Check
 
     public function supports(CheckContext $context): bool
     {
-        $command = $context->config['command'][0] ?? 'vendor/bin/phpcs';
+        $command = $context->config->command[0] ?? 'vendor/bin/phpcs';
         return file_exists($context->workingDirectory . '/' . $command);
     }
 
     public function createExecution(CheckContext $context): CheckExecution
     {
-        $command = $context->config['command'] ?? ['vendor/bin/phpcs'];
-        $args = $context->config['args'] ?? ['--report=json'];
+        $command = $context->config->command ?: ['vendor/bin/phpcs'];
+        $args = $context->config->args ?: ['--report=json'];
 
         return new CheckExecution(
             command: array_merge($command, $args),

@@ -21,14 +21,14 @@ final class PhpUnitCheck implements Check
 
     public function supports(CheckContext $context): bool
     {
-        $command = $context->config['command'][0] ?? 'vendor/bin/phpunit';
+        $command = $context->config->command[0] ?? 'vendor/bin/phpunit';
         return file_exists($context->workingDirectory . '/' . $command);
     }
 
     public function createExecution(CheckContext $context): CheckExecution
     {
-        $command = $context->config['command'] ?? ['vendor/bin/phpunit'];
-        $args = $context->config['args'] ?? [];
+        $command = $context->config->command ?: ['vendor/bin/phpunit'];
+        $args = $context->config->args ?: [];
 
         return new CheckExecution(
             command: array_merge($command, $args),

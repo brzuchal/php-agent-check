@@ -21,12 +21,12 @@ final class AgentCheck
     public function run(string $profileName, string $workingDirectory): Report
     {
         $config = $this->configLoader->load($workingDirectory);
-        $profileConfig = $config['profiles'][$profileName] ?? null;
-        if (!$profileConfig) {
+        $profile = $config->getProfile($profileName);
+        if (!$profile) {
             throw new \RuntimeException("Profile not found: $profileName");
         }
 
-        $toolsToRun = $profileConfig['tools'] ?? [];
+        $toolsToRun = $profile->tools;
         $report = new Report();
 
         /** @var Check $check */
@@ -35,7 +35,7 @@ final class AgentCheck
                 continue;
             }
 
-            $toolConfig = $config['tools'][$check->name()] ?? [];
+            $toolConfig = $config->getToolConfig($check->name());
             $context = new CheckContext($toolConfig, $workingDirectory);
 
             if (!$check->supports($context)) {
