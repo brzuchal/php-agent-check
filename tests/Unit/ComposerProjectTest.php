@@ -2,7 +2,7 @@
 
 namespace Brzuchal\PhpAgentCheck\Tests\Unit;
 
-use Brzuchal\PhpAgentCheck\Application\ComposerProject;
+use Brzuchal\PhpAgentCheck\Service\ComposerProject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 

@@ -1,8 +1,8 @@
 <?php
 
-namespace Brzuchal\PhpAgentCheck\UserInterface\Cli;
+namespace Brzuchal\PhpAgentCheck\Command;
 
-use Brzuchal\PhpAgentCheck\Application\AgentCheck;
+use Brzuchal\PhpAgentCheck\Service\AgentCheck;
 use Brzuchal\PhpAgentCheck\Domain\ExecutionMode;
 use Brzuchal\PhpAgentCheck\Domain\Profile;
 use Brzuchal\PhpAgentCheck\Domain\ToolStatus;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Brzuchal\PhpAgentCheck\Application;
+namespace Brzuchal\PhpAgentCheck\Service;
 
 use Brzuchal\PhpAgentCheck\Domain\ToolConfig;
 

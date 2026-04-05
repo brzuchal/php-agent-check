@@ -7,7 +7,7 @@ use Brzuchal\PhpAgentCheck\Tool\PhpStan\PhpStanDetector;
 use Brzuchal\PhpAgentCheck\Tool\PhpUnit\PhpUnitDetector;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
-use Brzuchal\PhpAgentCheck\UserInterface\Cli\InitCommand;
+use Brzuchal\PhpAgentCheck\Command\InitCommand;
 use Symfony\Component\Filesystem\Filesystem;
 
 class InitCommandTest extends TestCase
@@ -54,7 +54,10 @@ class InitCommandTest extends TestCase
             $tester->execute([]);
 
             $this->assertEquals(0, $tester->getStatusCode());
-            $this->assertStringContainsString("Created 'agentchk.yaml' with detected tools: phpunit, phpstan", $tester->getDisplay());
+            $this->assertStringContainsString(
+                "Created 'agentchk.yaml' with detected tools: phpunit, phpstan",
+                $tester->getDisplay()
+            );
             $this->assertFileExists($this->tempDir . '/agentchk.yaml');
 
             $config = file_get_contents($this->tempDir . '/agentchk.yaml');
@@ -84,7 +87,10 @@ class InitCommandTest extends TestCase
             $tester->execute([]);
 
             $this->assertEquals(0, $tester->getStatusCode());
-            $this->assertStringContainsString("Created 'agentchk.yaml' with detected tools: phpunit, phpstan, phpcs", $tester->getDisplay());
+            $this->assertStringContainsString(
+                "Created 'agentchk.yaml' with detected tools: phpunit, phpstan, phpcs",
+                $tester->getDisplay()
+            );
             $this->assertFileExists($this->tempDir . '/agentchk.yaml');
 
             $config = file_get_contents($this->tempDir . '/agentchk.yaml');
@@ -109,7 +115,10 @@ class InitCommandTest extends TestCase
         try {
             $tester->execute([]);
             $this->assertEquals(1, $tester->getStatusCode());
-            $this->assertStringContainsString("Configuration file 'agentchk.yaml' already exists.", $tester->getDisplay());
+            $this->assertStringContainsString(
+                "Configuration file 'agentchk.yaml' already exists.",
+                $tester->getDisplay()
+            );
         } finally {
             chdir($oldCwd);
         }

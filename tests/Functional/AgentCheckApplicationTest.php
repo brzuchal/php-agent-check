@@ -4,10 +4,10 @@ namespace Brzuchal\PhpAgentCheck\Tests\Functional;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
-use Brzuchal\PhpAgentCheck\UserInterface\Cli\CheckCommand;
-use Brzuchal\PhpAgentCheck\Application\AgentCheck;
+use Brzuchal\PhpAgentCheck\Command\CheckCommand;
+use Brzuchal\PhpAgentCheck\Service\AgentCheck;
 use Brzuchal\PhpAgentCheck\Infrastructure\Config\YamlConfigurationLoader;
-use Brzuchal\PhpAgentCheck\Application\ProcessRunner;
+use Brzuchal\PhpAgentCheck\Service\ProcessRunner;
 use Brzuchal\PhpAgentCheck\Domain\CheckExecution;
 use Brzuchal\PhpAgentCheck\Domain\CheckExecutionResult;
 use Brzuchal\PhpAgentCheck\Infrastructure\Reporter\HumanReportWriter;

@@ -2,7 +2,7 @@
 
 namespace Brzuchal\PhpAgentCheck\Infrastructure\Process;
 
-use Brzuchal\PhpAgentCheck\Application\ProcessRunner;
+use Brzuchal\PhpAgentCheck\Service\ProcessRunner;
 use Brzuchal\PhpAgentCheck\Domain\CheckExecution;
 use Brzuchal\PhpAgentCheck\Domain\CheckExecutionResult;
 use Symfony\Component\Process\Process;

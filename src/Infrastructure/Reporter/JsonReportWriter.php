@@ -2,7 +2,7 @@
 
 namespace Brzuchal\PhpAgentCheck\Infrastructure\Reporter;
 
-use Brzuchal\PhpAgentCheck\Application\ReportWriter;
+use Brzuchal\PhpAgentCheck\Service\ReportWriter;
 use Brzuchal\PhpAgentCheck\Domain\Report;
 use Symfony\Component\Console\Output\OutputInterface;
 

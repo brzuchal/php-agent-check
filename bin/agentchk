@@ -20,9 +20,9 @@ if (!$autoloadResult) {
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
-use Brzuchal\PhpAgentCheck\UserInterface\Cli\CheckCommand;
-use Brzuchal\PhpAgentCheck\UserInterface\Cli\InitCommand;
-use Brzuchal\PhpAgentCheck\Application\AgentCheck;
+use Brzuchal\PhpAgentCheck\Command\CheckCommand;
+use Brzuchal\PhpAgentCheck\Command\InitCommand;
+use Brzuchal\PhpAgentCheck\Service\AgentCheck;
 use Brzuchal\PhpAgentCheck\Infrastructure\Config\YamlConfigurationLoader;
 use Brzuchal\PhpAgentCheck\Infrastructure\Process\SymfonyProcessRunner;
 use Brzuchal\PhpAgentCheck\Infrastructure\Reporter\JsonReportWriter;

@@ -2,8 +2,8 @@
 
 namespace Brzuchal\PhpAgentCheck\Tool\PhpCs;
 
-use Brzuchal\PhpAgentCheck\Application\ComposerProject;
-use Brzuchal\PhpAgentCheck\Application\ToolDetector;
+use Brzuchal\PhpAgentCheck\Service\ComposerProject;
+use Brzuchal\PhpAgentCheck\Service\ToolDetector;
 use Brzuchal\PhpAgentCheck\Domain\ToolConfig;
 
 final class PhpCsDetector implements ToolDetector

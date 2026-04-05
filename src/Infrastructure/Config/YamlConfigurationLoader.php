@@ -2,7 +2,7 @@
 
 namespace Brzuchal\PhpAgentCheck\Infrastructure\Config;
 
-use Brzuchal\PhpAgentCheck\Application\ConfigurationLoader;
+use Brzuchal\PhpAgentCheck\Service\ConfigurationLoader;
 use Brzuchal\PhpAgentCheck\Domain\ProfileDefinition;
 use Brzuchal\PhpAgentCheck\Domain\ProjectConfiguration;
 use Brzuchal\PhpAgentCheck\Domain\ToolConfig;

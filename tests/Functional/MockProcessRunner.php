@@ -2,7 +2,7 @@
 
 namespace Brzuchal\PhpAgentCheck\Tests\Functional;
 
-use Brzuchal\PhpAgentCheck\Application\ProcessRunner;
+use Brzuchal\PhpAgentCheck\Service\ProcessRunner;
 use Brzuchal\PhpAgentCheck\Domain\CheckExecution;
 use Brzuchal\PhpAgentCheck\Domain\CheckExecutionResult;
 

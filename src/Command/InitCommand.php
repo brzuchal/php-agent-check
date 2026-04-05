@@ -1,9 +1,9 @@
 <?php
 
-namespace Brzuchal\PhpAgentCheck\UserInterface\Cli;
+namespace Brzuchal\PhpAgentCheck\Command;
 
-use Brzuchal\PhpAgentCheck\Application\ComposerProject;
-use Brzuchal\PhpAgentCheck\Application\ToolDetector;
+use Brzuchal\PhpAgentCheck\Service\ComposerProject;
+use Brzuchal\PhpAgentCheck\Service\ToolDetector;
 use Brzuchal\PhpAgentCheck\Domain\ProfileDefinition;
 use Brzuchal\PhpAgentCheck\Domain\ProjectConfiguration;
 use Brzuchal\PhpAgentCheck\Infrastructure\Config\YamlConfigurationLoader;
