@@ -80,4 +80,5 @@ $agentCheck = new AgentCheck(
 $application = new Application('AgentCheck', '1.1.0');
 $application->add(new AgentCheckCommand($agentCheck));
 $application->add(new InitCommand($detectors));
+$application->setDefaultCommand('check', false);
 $application->run($input, $output);

@@ -15,7 +15,7 @@ final class AgentCheckCommand extends Command
 {
     public function __construct(private AgentCheck $agentCheck)
     {
-        parent::__construct('run');
+        parent::__construct('check');
     }
 
     protected function configure(): void
