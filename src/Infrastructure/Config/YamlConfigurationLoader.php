@@ -6,6 +6,7 @@ use Brzuchal\PhpAgentCheck\Application\ConfigurationLoader;
 use Brzuchal\PhpAgentCheck\Domain\ProfileDefinition;
 use Brzuchal\PhpAgentCheck\Domain\ProjectConfiguration;
 use Brzuchal\PhpAgentCheck\Domain\ToolConfig;
+use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Yaml\Yaml;
 
 final class YamlConfigurationLoader implements ConfigurationLoader
@@ -24,8 +25,10 @@ final class YamlConfigurationLoader implements ConfigurationLoader
             $path = $dir . DIRECTORY_SEPARATOR . $candidate;
             if (file_exists($path)) {
                 $data = Yaml::parseFile($path);
+                $processor = new Processor();
+                $config = $processor->processConfiguration(new ConfigurationDefinition(), [$data]);
 
-                return $this->mapToProjectConfiguration($data);
+                return $this->mapToProjectConfiguration($config);
             }
         }
 

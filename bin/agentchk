@@ -21,6 +21,7 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Brzuchal\PhpAgentCheck\UserInterface\Cli\AgentCheckCommand;
+use Brzuchal\PhpAgentCheck\UserInterface\Cli\InitCommand;
 use Brzuchal\PhpAgentCheck\Application\AgentCheck;
 use Brzuchal\PhpAgentCheck\Infrastructure\Config\YamlConfigurationLoader;
 use Brzuchal\PhpAgentCheck\Infrastructure\Process\SymfonyProcessRunner;
@@ -69,5 +70,6 @@ $agentCheck = new AgentCheck(
 
 $application = new Application('AgentCheck', '1.1.0');
 $application->add(new AgentCheckCommand($agentCheck));
+$application->add(new InitCommand());
 $application->setDefaultCommand('run', true);
 $application->run($input, $output);
