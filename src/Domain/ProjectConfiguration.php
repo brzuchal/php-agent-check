@@ -23,4 +23,22 @@ final class ProjectConfiguration
     {
         return $this->tools[$name] ?? new ToolConfig($name);
     }
+
+    public function toArray(): array
+    {
+        $profiles = [];
+        foreach ($this->profiles as $name => $profile) {
+            $profiles[$name] = $profile->toArray();
+        }
+
+        $tools = [];
+        foreach ($this->tools as $name => $tool) {
+            $tools[$name] = $tool->toArray();
+        }
+
+        return [
+            'profiles' => $profiles,
+            'tools' => $tools,
+        ];
+    }
 }

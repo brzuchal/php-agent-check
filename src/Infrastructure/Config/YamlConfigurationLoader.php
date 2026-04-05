@@ -35,6 +35,11 @@ final class YamlConfigurationLoader implements ConfigurationLoader
         throw new \RuntimeException("No configuration file found. Looked for: " . implode(', ', $candidates));
     }
 
+    public function dump(ProjectConfiguration $config): string
+    {
+        return Yaml::dump($config->toArray(), 4);
+    }
+
     private function mapToProjectConfiguration(array $data): ProjectConfiguration
     {
         $profiles = [];

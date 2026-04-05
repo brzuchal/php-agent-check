@@ -29,10 +29,13 @@ use Brzuchal\PhpAgentCheck\Infrastructure\Reporter\JsonReportWriter;
 use Brzuchal\PhpAgentCheck\Infrastructure\Reporter\HumanReportWriter;
 use Brzuchal\PhpAgentCheck\Tool\PhpUnit\PhpUnitCheck;
 use Brzuchal\PhpAgentCheck\Tool\PhpUnit\PhpUnitJunitParser;
+use Brzuchal\PhpAgentCheck\Tool\PhpUnit\PhpUnitDetector;
 use Brzuchal\PhpAgentCheck\Tool\PhpStan\PhpStanCheck;
 use Brzuchal\PhpAgentCheck\Tool\PhpStan\PhpStanJsonParser;
+use Brzuchal\PhpAgentCheck\Tool\PhpStan\PhpStanDetector;
 use Brzuchal\PhpAgentCheck\Tool\PhpCs\PhpCsCheck;
 use Brzuchal\PhpAgentCheck\Tool\PhpCs\PhpCsJsonParser;
+use Brzuchal\PhpAgentCheck\Tool\PhpCs\PhpCsDetector;
 use Brzuchal\PhpAgentCheck\Domain\ExecutionMode;
 
 $input = new ArgvInput();
@@ -61,6 +64,12 @@ $checks = [
     new PhpCsCheck(new PhpCsJsonParser()),
 ];
 
+$detectors = [
+    new PhpUnitDetector(),
+    new PhpStanDetector(),
+    new PhpCsDetector(),
+];
+
 $agentCheck = new AgentCheck(
     new YamlConfigurationLoader(),
     new SymfonyProcessRunner($output),
@@ -70,6 +79,5 @@ $agentCheck = new AgentCheck(
 
 $application = new Application('AgentCheck', '1.1.0');
 $application->add(new AgentCheckCommand($agentCheck));
-$application->add(new InitCommand());
-$application->setDefaultCommand('run', true);
+$application->add(new InitCommand($detectors));
 $application->run($input, $output);

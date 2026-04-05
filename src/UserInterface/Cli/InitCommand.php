@@ -2,15 +2,25 @@
 
 namespace Brzuchal\PhpAgentCheck\UserInterface\Cli;
 
+use Brzuchal\PhpAgentCheck\Application\ToolDetector;
+use Brzuchal\PhpAgentCheck\Domain\ProfileDefinition;
+use Brzuchal\PhpAgentCheck\Domain\ProjectConfiguration;
+use Brzuchal\PhpAgentCheck\Infrastructure\Config\YamlConfigurationLoader;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Yaml\Yaml;
 
 final class InitCommand extends Command
 {
     protected static $defaultName = 'init';
+
+    /** @param iterable<ToolDetector> $detectors */
+    public function __construct(
+        private readonly iterable $detectors
+    ) {
+        parent::__construct();
+    }
 
     protected function configure(): void
     {
@@ -32,56 +42,26 @@ final class InitCommand extends Command
         $tools = [];
         $profileTools = [];
 
-        if ($this->hasPhpUnit($workingDir)) {
-            $tools['phpunit'] = [
-                'command' => ['vendor/bin/phpunit'],
-                'args' => ['--log-junit', 'var/agentchk/phpunit.junit.xml', '--no-progress'],
-            ];
-            $profileTools[] = 'phpunit';
+        foreach ($this->detectors as $detector) {
+            $toolConfig = $detector->detect($workingDir);
+            if ($toolConfig !== null) {
+                $tools[$detector->name()] = $toolConfig;
+                $profileTools[] = $detector->name();
+            }
         }
 
-        if ($this->hasPhpStan($workingDir)) {
-            $tools['phpstan'] = [
-                'command' => ['vendor/bin/phpstan'],
-                'args' => ['analyse', '--error-format=json'],
-            ];
-            $profileTools[] = 'phpstan';
-        }
-
-        if ($this->hasPhpCs($workingDir)) {
-            $tools['phpcs'] = [
-                'command' => ['vendor/bin/phpcs'],
-                'args' => ['--report=json', 'src', 'tests'],
-            ];
-            $profileTools[] = 'phpcs';
-        }
-
-        $config = [
-            'profiles' => [
-                'fast' => ['tools' => $profileTools],
-                'full' => ['tools' => $profileTools],
+        $config = new ProjectConfiguration(
+            profiles: [
+                'fast' => new ProfileDefinition('fast', $profileTools),
+                'full' => new ProfileDefinition('full', $profileTools),
             ],
-            'tools' => $tools,
-        ];
+            tools: $tools
+        );
 
-        file_put_contents($configPath, Yaml::dump($config, 4));
+        $loader = new YamlConfigurationLoader();
+        file_put_contents($configPath, $loader->dump($config));
         $io->success("Created 'agentchk.yaml' with detected tools: " . implode(', ', $profileTools));
 
         return 0;
-    }
-
-    private function hasPhpUnit(string $dir): bool
-    {
-        return file_exists($dir . '/phpunit.xml') || file_exists($dir . '/phpunit.xml.dist');
-    }
-
-    private function hasPhpStan(string $dir): bool
-    {
-        return file_exists($dir . '/phpstan.neon') || file_exists($dir . '/phpstan.neon.dist');
-    }
-
-    private function hasPhpCs(string $dir): bool
-    {
-        return file_exists($dir . '/phpcs.xml') || file_exists($dir . '/phpcs.xml.dist');
     }
 }

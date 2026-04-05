@@ -12,4 +12,11 @@ final class ProfileDefinition
         public readonly array $tools
     ) {
     }
+
+    public function toArray(): array
+    {
+        return [
+            'tools' => $this->tools,
+        ];
+    }
 }

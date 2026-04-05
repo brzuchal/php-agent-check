@@ -10,4 +10,12 @@ final class ToolConfig
         public readonly array $args = []
     ) {
     }
+
+    public function toArray(): array
+    {
+        return [
+            'command' => $this->command,
+            'args' => $this->args,
+        ];
+    }
 }

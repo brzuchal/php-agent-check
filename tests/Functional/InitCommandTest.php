@@ -2,6 +2,9 @@
 
 namespace Brzuchal\PhpAgentCheck\Tests\Functional;
 
+use Brzuchal\PhpAgentCheck\Tool\PhpCs\PhpCsDetector;
+use Brzuchal\PhpAgentCheck\Tool\PhpStan\PhpStanDetector;
+use Brzuchal\PhpAgentCheck\Tool\PhpUnit\PhpUnitDetector;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 use Brzuchal\PhpAgentCheck\UserInterface\Cli\InitCommand;
@@ -11,12 +14,18 @@ class InitCommandTest extends TestCase
 {
     private string $tempDir;
     private Filesystem $fs;
+    private array $detectors;
 
     protected function setUp(): void
     {
         $this->fs = new Filesystem();
         $this->tempDir = sys_get_temp_dir() . '/agentchk_test_' . uniqid();
         $this->fs->mkdir($this->tempDir);
+        $this->detectors = [
+            new PhpUnitDetector(),
+            new PhpStanDetector(),
+            new PhpCsDetector(),
+        ];
     }
 
     protected function tearDown(): void
@@ -31,7 +40,7 @@ class InitCommandTest extends TestCase
         $this->fs->touch($this->tempDir . '/phpstan.neon');
         $this->fs->touch($this->tempDir . '/phpcs.xml');
 
-        $command = new InitCommand();
+        $command = new InitCommand($this->detectors);
         $tester = new CommandTester($command);
 
         // We need to change CWD because InitCommand uses getcwd()
@@ -58,7 +67,7 @@ class InitCommandTest extends TestCase
     {
         $this->fs->touch($this->tempDir . '/agentchk.yaml');
 
-        $command = new InitCommand();
+        $command = new InitCommand($this->detectors);
         $tester = new CommandTester($command);
 
         $oldCwd = getcwd();
