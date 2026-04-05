@@ -44,9 +44,17 @@ class RunCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         try {
-            $mode = ExecutionMode::from($input->getOption('mode'));
+            $modeOpt = $input->getOption('mode');
+            $envMode = getenv('AGENTCHK_MODE');
+            if ($envMode !== false) {
+                $modeOpt = $envMode === '1' ? 'agent' : $envMode;
+            } elseif (getenv('AGENT_MODE') === '1') {
+                $modeOpt = 'agent';
+            }
+            $mode = ExecutionMode::tryFrom($modeOpt) ?? ExecutionMode::Human;
+
             $profile = Profile::from($input->getOption('profile'));
-            $format = $input->getOption('format');
+            $format = $input->getOption('format') ?? (getenv('AGENTCHK_OUTPUT') === 'json' ? 'json' : null);
 
             $config = new Configuration(workingDirectory: getcwd());
             $config->load();

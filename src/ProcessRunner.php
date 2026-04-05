@@ -13,6 +13,7 @@ class ProcessRunner
 
     public function run(array $command, array $env = [], float|int|null $timeout = 60): Process
     {
+        $env = array_merge($env, ['AGENTCHK' => '1']);
         $process = new Process($command, $this->workingDirectory, $env);
         $process->setTimeout($timeout);
         $process->run();
