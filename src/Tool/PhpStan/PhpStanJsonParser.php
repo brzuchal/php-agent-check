@@ -46,7 +46,8 @@ final class PhpStanJsonParser
                     severity: Severity::Error,
                     message: $msg['message'] ?? 'Unknown error',
                     file: $file,
-                    line: $msg['line'] ?? null
+                    line: $msg['line'] ?? null,
+                    code: $msg['identifier'] ?? null
                 );
             }
         }
