@@ -1,10 +1,73 @@
 #!/usr/bin/env php
 <?php
 
-require __DIR__ . '/../vendor/autoload.php';
+$files = [
+    __DIR__ . '/../vendor/autoload.php',
+    __DIR__ . '/vendor/autoload.php'
+];
+$autoloadResult = false;
+foreach ($files as $file) {
+    if (file_exists($file)) {
+        require $file;
+        $autoloadResult = true;
+        break;
+    }
+}
+if (!$autoloadResult) {
+    die("You must set up the project dependencies, run the following commands:\n> wget https://getcomposer.org/composer.phar\n> php composer.phar install\n");
+}
 
-use Brzuchal\PhpAgentCheck\AgentCheckApplication;
+use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Input\ArgvInput;
+use Symfony\Component\Console\Output\ConsoleOutput;
+use Brzuchal\PhpAgentCheck\UserInterface\Cli\AgentCheckCommand;
+use Brzuchal\PhpAgentCheck\Application\AgentCheck;
+use Brzuchal\PhpAgentCheck\Infrastructure\Config\YamlConfigurationLoader;
+use Brzuchal\PhpAgentCheck\Infrastructure\Process\SymfonyProcessRunner;
+use Brzuchal\PhpAgentCheck\Infrastructure\Reporter\JsonReportWriter;
+use Brzuchal\PhpAgentCheck\Infrastructure\Reporter\HumanReportWriter;
+use Brzuchal\PhpAgentCheck\Tool\PhpUnit\PhpUnitCheck;
+use Brzuchal\PhpAgentCheck\Tool\PhpUnit\PhpUnitJunitParser;
+use Brzuchal\PhpAgentCheck\Tool\PhpStan\PhpStanCheck;
+use Brzuchal\PhpAgentCheck\Tool\PhpStan\PhpStanJsonParser;
+use Brzuchal\PhpAgentCheck\Tool\PhpCs\PhpCsCheck;
+use Brzuchal\PhpAgentCheck\Tool\PhpCs\PhpCsJsonParser;
+use Brzuchal\PhpAgentCheck\Domain\ExecutionMode;
 
-$application = new AgentCheckApplication();
-// Use the underlying application exit status directly
-$application->run();
+$input = new ArgvInput();
+$output = new ConsoleOutput();
+
+$format = $input->getParameterOption(['--format', '-f']) ?: (getenv('AGENTCHK_OUTPUT') === 'json' ? 'json' : null);
+$modeOpt = $input->getParameterOption(['--mode', '-m']) ?: 'human';
+$envMode = getenv('AGENTCHK_MODE');
+if ($envMode !== false) {
+    $modeOpt = $envMode === '1' ? 'agent' : $envMode;
+} elseif (getenv('AGENT_MODE') === '1') {
+    $modeOpt = 'agent';
+}
+
+$mode = ExecutionMode::tryFrom($modeOpt) ?? ExecutionMode::Human;
+
+if ($format === 'json' || $mode === ExecutionMode::Agent) {
+    $reporters = [new JsonReportWriter($output)];
+} else {
+    $reporters = [new HumanReportWriter($output)];
+}
+
+$checks = [
+    new PhpUnitCheck(new PhpUnitJunitParser()),
+    new PhpStanCheck(new PhpStanJsonParser()),
+    new PhpCsCheck(new PhpCsJsonParser()),
+];
+
+$agentCheck = new AgentCheck(
+    new YamlConfigurationLoader(),
+    new SymfonyProcessRunner(),
+    $checks,
+    $reporters
+);
+
+$application = new Application('AgentCheck', '1.1.0');
+$application->add(new AgentCheckCommand($agentCheck));
+$application->setDefaultCommand('run', true);
+$application->run($input, $output);

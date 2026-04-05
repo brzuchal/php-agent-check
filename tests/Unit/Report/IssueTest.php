@@ -2,8 +2,8 @@
 
 namespace Brzuchal\PhpAgentCheck\Tests\Unit\Report;
 
-use Brzuchal\PhpAgentCheck\Report\Issue;
-use Brzuchal\PhpAgentCheck\Report\Severity;
+use Brzuchal\PhpAgentCheck\Domain\Issue;
+use Brzuchal\PhpAgentCheck\Domain\Severity;
 use PHPUnit\Framework\TestCase;
 
 class IssueTest extends TestCase
