@@ -1,12 +1,3 @@
-Zaktualizowana wersja **PROJECT.md** z uwzględnieniem:
-
-* nazwy pakietu: **`brzuchal/php-agent-check`**
-* binarki: **`vendor/bin/agentchk`**
-* minimalnej wersji PHP: **`^8.1`**
-* architektury pod agenty
-* zasad outputu i integracji z PHPUnit / PHPStan / PHPCS / Psalm
-
-````md
 # PROJECT.md
 
 ## Project
@@ -230,110 +221,539 @@ vendor/bin/agentchk --profile=agent --format=json
 
 ---
 
-## Architecture
+## Architecture for Agents
 
-The architecture is split into clear responsibilities.
+The codebase must be organized into clear layers with explicit responsibilities.
+Do not mix CLI parsing, process execution, tool-specific parsing, and report generation in one class.
 
-### 1. AgentCheck
+### Design Goals
 
-Main orchestration service.
+The architecture must provide:
+
+* deterministic execution
+* low-noise machine-readable output
+* easy support for multiple tools
+* replaceable parsers and reporters
+* explicit separation between orchestration, execution, parsing, and presentation
+
+---
+
+## Layers
+
+### 1. Entry Layer
+
+Responsible for:
+
+* CLI entrypoint
+* reading arguments
+* selecting mode and profile
+* bootstrapping application services
+* returning final exit code
+
+Examples:
+
+* `bin/agentchk`
+* `Command\AgentCheckCommand`
+
+This layer must not contain:
+
+* tool-specific parsing logic
+* process management details
+* report normalization rules
+
+---
+
+### 2. Application Layer
+
+Responsible for orchestration of the whole use case.
+
+Main use case:
+
+* run selected checks
+* aggregate results
+* build final report
+
+Suggested class:
+
+* `Application\AgentCheck`
+
+This layer coordinates:
+
+* configuration loading
+* profile resolution
+* tool selection
+* execution flow
+* final report creation
+
+This layer must not know:
+
+* raw stdout format details of each tool
+* Symfony Process internals
+* filesystem layout details beyond required abstractions
+
+---
+
+### 3. Domain Layer
+
+Responsible for core concepts and rules.
+
+Suggested domain objects:
+
+* `Check`
+* `CheckDefinition`
+* `CheckResult`
+* `Issue`
+* `Report`
+* `Profile`
+* `ExecutionMode`
+* `ToolStatus`
+* `Severity`
+
+This layer defines:
+
+* what a validation issue is
+* what a tool result is
+* what final report status means
+* how statuses aggregate
+
+Example rules:
+
+* if any tool has `error`, report status is `error`
+* else if any tool has `failed`, report status is `failed`
+* else report status is `passed`
+
+This layer must not depend on:
+
+* Symfony
+* Process
+* CLI
+* XML/JSON parser implementations
+
+---
+
+### 4. Infrastructure Layer
+
+Responsible for technical integrations.
+
+Examples:
+
+* process execution
+* filesystem access
+* YAML config loading
+* XML parsing
+* JSON decoding
+* writing output files
+
+Suggested components:
+
+* `Infrastructure\Process\SymfonyProcessRunner`
+* `Infrastructure\Config\YamlConfigurationLoader`
+* `Infrastructure\Filesystem\LocalFilesystem`
+* `Infrastructure\Reporter\JsonReportWriter`
+
+This layer implements interfaces required by application/domain.
+
+---
+
+### 5. Tool Adapter Layer
+
+Responsible for integration with specific tools.
+
+Each tool should have its own adapter module.
+
+Examples:
+
+* `Tool\PhpUnit\PhpUnitCheck`
+* `Tool\PhpUnit\PhpUnitJunitParser`
+* `Tool\PhpStan\PhpStanCheck`
+* `Tool\PhpStan\PhpStanJsonParser`
+* `Tool\PhpCs\PhpCsCheck`
+* `Tool\Psalm\PsalmCheck`
+
+A tool adapter is responsible for:
+
+* building command arguments
+* declaring required output format
+* parsing tool-specific output
+* converting raw result into normalized `Issue` objects
+
+A tool adapter must not:
+
+* decide global profile selection
+* aggregate whole-project results
+* decide final CLI rendering
+
+---
+
+## Recommended Abstractions
+
+### `Check`
+
+Represents one runnable validation unit.
 
 Responsibilities:
 
-* load configuration
-* determine mode
-* determine profile
-* execute tools
-* aggregate results
-* produce final report
-* return correct exit code
+* provide tool name
+* build execution request
+* parse execution result
 
-### 2. ProcessRunner
-
-Tool execution abstraction built on:
+Suggested contract:
 
 ```php
-Symfony\Component\Process\Process
+interface Check
+{
+    public function name(): string;
+
+    public function supports(ProjectContext $context): bool;
+
+    public function createExecution(CheckContext $context): CheckExecution;
+
+    public function parse(CheckExecutionResult $result): CheckResult;
+}
 ```
+
+---
+
+### `ProcessRunner`
+
+Abstraction for running external commands.
 
 Responsibilities:
 
-* execute commands
-* set working directory
-* pass environment variables
-* capture stdout and stderr
-* enforce timeouts
+* run command
+* capture stdout/stderr
 * capture exit code
-* return execution result
+* enforce timeout
 
-### 3. Check
+Suggested contract:
 
-Represents a single integration with a validation tool.
+```php
+interface ProcessRunner
+{
+    public function run(CheckExecution $execution): CheckExecutionResult;
+}
+```
 
-Each check should define:
+Implementation:
 
-* name
-* support conditions
-* command
+* `SymfonyProcessRunner`
+
+---
+
+### `CheckExecution`
+
+A value object describing how a tool should be executed.
+
+Suggested fields:
+
+* command array
+* working directory
+* environment variables
+* timeout
+* expected output files
+
+This prevents leaking `Process` details into higher layers.
+
+---
+
+### `CheckExecutionResult`
+
+Normalized raw execution result.
+
+Suggested fields:
+
+* exit code
+* stdout
+* stderr
+* duration
+* generated files
+
+This is the handoff point between execution and parsing.
+
+---
+
+### `CheckResult`
+
+Normalized result of one tool.
+
+Suggested fields:
+
+* tool name
+* status
+* issues
+* metadata
+
+Example:
+
+```php
+final readonly class CheckResult
+{
+    public function __construct(
+        public string $tool,
+        public ToolStatus $status,
+        /** @var list<Issue> */
+        public array $issues,
+    ) {}
+}
+```
+
+---
+
+### `Issue`
+
+Core normalized problem object.
+
+Suggested fields:
+
+* tool
+* type
+* severity
+* message
+* file
+* line
+* code
+* test name
+
+The agent should always work on `Issue`, never on raw tool output.
+
+---
+
+### `Report`
+
+Aggregated result for the full run.
+
+Responsibilities:
+
+* collect all `CheckResult`
+* compute final status
+* expose machine-friendly structure
+
+---
+
+### `ConfigurationLoader`
+
+Loads `agentchk.yaml` and maps it into config objects.
+
+Suggested contract:
+
+```php
+interface ConfigurationLoader
+{
+    public function load(string $path): ProjectConfiguration;
+}
+```
+
+---
+
+### `ReportWriter`
+
+Writes final output.
+
+Implementations may include:
+
+* JSON writer
+* NDJSON writer
+* human summary writer
+
+Suggested contract:
+
+```php
+interface ReportWriter
+{
+    public function write(Report $report, OutputTarget $target): void;
+}
+```
+
+---
+
+## Execution Flow
+
+The expected flow is:
+
+1. entrypoint reads CLI arguments
+2. configuration is loaded
+3. mode and profile are resolved
+4. matching checks are selected
+5. each check builds a `CheckExecution`
+6. `ProcessRunner` executes it
+7. the corresponding tool parser converts output into `CheckResult`
+8. results are aggregated into `Report`
+9. `ReportWriter` renders final output
+10. exit code is returned
+
+---
+
+## Separation Rules
+
+The agent must preserve these rules:
+
+### CLI layer
+
+May know:
+
 * arguments
-* output strategy
-* parser
+* exit code
+* output mode
 
-Examples:
+May not know:
 
-* `PhpUnitCheck`
-* `PhpStanCheck`
-* `PhpCsCheck`
-* `PsalmCheck`
+* how PHPUnit XML is parsed
+* how PHPStan JSON is normalized
 
-### 4. OutputParser
+### Application layer
 
-Responsible for transforming raw tool output into normalized issues.
+May know:
 
-Examples:
+* which checks are selected
+* execution order
+* aggregation logic
 
-* `PhpUnitJunitParser`
-* `PhpStanJsonParser`
-* `PhpCsJsonParser`
-* `PsalmJsonParser`
+May not know:
 
-### 5. Report Model
+* Symfony Process API details
+* DOM/XPath parsing details
 
-Common normalized structures used across tools.
+### Tool adapter layer
 
-#### Issue
+May know:
 
-```json
-{
-  "type": "string",
-  "tool": "string",
-  "severity": "error|warning",
-  "message": "string",
-  "file": "string|null",
-  "line": "int|null",
-  "test": "string|null",
-  "code": "string|null"
-}
+* tool-specific command flags
+* tool-specific output format
+* tool-specific parsing rules
+
+May not know:
+
+* global report rendering
+* CLI concerns
+* profile selection policy
+
+### Domain layer
+
+May know:
+
+* statuses
+* issues
+* report rules
+
+May not know:
+
+* filesystem
+* external process details
+* YAML/JSON/XML libraries
+
+---
+
+## Recommended Directory Structure
+
+```text
+src/
+  Application/
+    AgentCheck.php
+    CheckRegistry.php
+
+  Domain/
+    Check.php
+    CheckContext.php
+    CheckDefinition.php
+    CheckExecution.php
+    CheckExecutionResult.php
+    CheckResult.php
+    Issue.php
+    Report.php
+    ToolStatus.php
+    Severity.php
+    ExecutionMode.php
+    Profile.php
+
+  Infrastructure/
+    Config/
+      YamlConfigurationLoader.php
+    Process/
+      SymfonyProcessRunner.php
+    Reporter/
+      JsonReportWriter.php
+      HumanReportWriter.php
+    Filesystem/
+      LocalFilesystem.php
+
+  Tool/
+    PhpUnit/
+      PhpUnitCheck.php
+      PhpUnitJunitParser.php
+    PhpStan/
+      PhpStanCheck.php
+      PhpStanJsonParser.php
+    PhpCs/
+      PhpCsCheck.php
+      PhpCsJsonParser.php
+    Psalm/
+      PsalmCheck.php
+      PsalmJsonParser.php
+
+  UserInterface/
+    Cli/
+      AgentCheckCommand.php
 ```
 
-#### ToolResult
+---
 
-```json
-{
-  "name": "phpunit",
-  "status": "passed|failed|error",
-  "issues": []
-}
-```
+## Extension Strategy
 
-#### Report
+New tools must be added by introducing:
 
-```json
-{
-  "status": "passed|failed|error",
-  "tools": []
-}
-```
+* one new `Check` implementation
+* one parser for that tool
+* optional config mapping
+
+The agent must not modify existing tool adapters unless behavior must change.
+
+This makes the system open for extension and closed for unrelated changes.
+
+---
+
+## Anti-Patterns
+
+Do not implement:
+
+* one giant `AgentCheckCommand` doing everything
+* direct use of `Process` in tool parsers
+* parsers returning arrays without domain objects
+* report writing mixed with parsing
+* raw stdout passed directly to agents
+* tool-specific conditionals spread across the application layer
+
+Bad example:
+
+* `if ($tool === 'phpunit') { ... } elseif ($tool === 'phpstan') { ... }`
+
+Preferred:
+
+* dedicated tool adapters registered in a registry
+
+---
+
+## Recommended Agent Behavior
+
+When changing the architecture, the agent must:
+
+1. preserve layer boundaries
+2. add new abstractions only when they remove real coupling
+3. prefer explicit value objects over loose arrays
+4. keep tool-specific logic isolated
+5. keep final output normalized through shared domain models
+
+---
+
+## Practical Rule of Thumb
+
+If a class:
+
+* knows how to run a process,
+* parse PHPUnit XML,
+* aggregate results,
+* and print JSON,
+
+then it has too many responsibilities and must be split.
 
 ---
 
@@ -640,12 +1060,3 @@ It provides:
 * explicit execution modes
 * support for multiple validation tools
 * deterministic automation-friendly reporting
-
-```
-
-Jeżeli chcesz, następny krok to przygotowanie z tego od razu:
-- `README.md`
-- `composer.json`
-- szkielet katalogów `src/`
-- pierwsze klasy pod `Symfony Process` i `agentchk.yaml`.
-```
