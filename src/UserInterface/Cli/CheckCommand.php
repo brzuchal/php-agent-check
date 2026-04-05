@@ -11,9 +11,9 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-final class AgentCheckCommand extends Command
+final class CheckCommand extends Command
 {
-    public function __construct(private AgentCheck $agentCheck)
+    public function __construct(private readonly AgentCheck $agentCheck)
     {
         parent::__construct('check');
     }

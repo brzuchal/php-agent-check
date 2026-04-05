@@ -10,7 +10,7 @@ use Brzuchal\PhpAgentCheck\Domain\CheckResult;
 
 final class PhpUnitCheck implements Check
 {
-    public function __construct(private PhpUnitJunitParser $parser)
+    public function __construct(private readonly PhpUnitJunitParser $parser)
     {
     }
 

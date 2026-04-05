@@ -4,7 +4,7 @@ namespace Brzuchal\PhpAgentCheck\Tests\Functional;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
-use Brzuchal\PhpAgentCheck\UserInterface\Cli\AgentCheckCommand;
+use Brzuchal\PhpAgentCheck\UserInterface\Cli\CheckCommand;
 use Brzuchal\PhpAgentCheck\Application\AgentCheck;
 use Brzuchal\PhpAgentCheck\Infrastructure\Config\YamlConfigurationLoader;
 use Brzuchal\PhpAgentCheck\Application\ProcessRunner;
@@ -38,7 +38,7 @@ class AgentCheckApplicationTest extends TestCase
             $reporters
         );
 
-        $command = new AgentCheckCommand($agentCheck);
+        $command = new CheckCommand($agentCheck);
 
         $commandTester = new CommandTester($command);
         $commandTester->execute([

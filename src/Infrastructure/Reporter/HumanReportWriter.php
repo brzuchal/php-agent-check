@@ -8,7 +8,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 final class HumanReportWriter implements ReportWriter
 {
-    public function __construct(private OutputInterface $output)
+    public function __construct(private readonly OutputInterface $output)
     {
     }
 

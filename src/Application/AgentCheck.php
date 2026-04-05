@@ -9,12 +9,12 @@ use Brzuchal\PhpAgentCheck\Domain\Report;
 final class AgentCheck
 {
     public function __construct(
-        private ConfigurationLoader $configLoader,
-        private ProcessRunner $processRunner,
+        private readonly ConfigurationLoader $configLoader,
+        private readonly ProcessRunner $processRunner,
         /** @var iterable<Check> */
-        private iterable $checks,
+        private readonly iterable $checks,
         /** @var iterable<ReportWriter> */
-        private iterable $reporters
+        private readonly iterable $reporters
     ) {
     }
 
@@ -27,7 +27,7 @@ final class AgentCheck
         }
 
         $toolsToRun = $profile->tools;
-        $report = new Report();
+        $toolsResults = [];
 
         /** @var Check $check */
         foreach ($this->checks as $check) {
@@ -45,10 +45,13 @@ final class AgentCheck
             $execution = $check->createExecution($context);
             $result = $this->processRunner->run($execution);
             $checkResult = $check->parse($result);
-            $report->tools[] = $checkResult;
+            $toolsResults[] = $checkResult;
         }
 
-        $this->computeFinalStatus($report);
+        $report = new Report(
+            $this->computeFinalStatus($toolsResults),
+            $toolsResults
+        );
 
         foreach ($this->reporters as $reporter) {
             $reporter->write($report);
@@ -57,16 +60,17 @@ final class AgentCheck
         return $report;
     }
 
-    private function computeFinalStatus(Report $report): void
+    /**
+     * @param list<\Brzuchal\PhpAgentCheck\Domain\CheckResult> $toolsResults
+     */
+    private function computeFinalStatus(array $toolsResults): \Brzuchal\PhpAgentCheck\Domain\ToolStatus
     {
-        $hasErrors = false;
-        foreach ($report->tools as $toolResult) {
+        foreach ($toolsResults as $toolResult) {
             if ($toolResult->status !== \Brzuchal\PhpAgentCheck\Domain\ToolStatus::Passed) {
-                $hasErrors = true;
+                return \Brzuchal\PhpAgentCheck\Domain\ToolStatus::Failed;
             }
         }
-        $report->status = $hasErrors ?
-            \Brzuchal\PhpAgentCheck\Domain\ToolStatus::Failed :
-            \Brzuchal\PhpAgentCheck\Domain\ToolStatus::Passed;
+
+        return \Brzuchal\PhpAgentCheck\Domain\ToolStatus::Passed;
     }
 }

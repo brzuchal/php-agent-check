@@ -10,7 +10,7 @@ use Brzuchal\PhpAgentCheck\Domain\CheckResult;
 
 final class PhpStanCheck implements Check
 {
-    public function __construct(private PhpStanJsonParser $parser)
+    public function __construct(private readonly PhpStanJsonParser $parser)
     {
     }
 

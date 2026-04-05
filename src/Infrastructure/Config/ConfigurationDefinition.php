@@ -11,6 +11,9 @@ final class ConfigurationDefinition implements ConfigurationInterface
     {
         $treeBuilder = new TreeBuilder('agentchk');
         $rootNode = $treeBuilder->getRootNode();
+        if (!$rootNode instanceof \Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition) {
+            throw new \RuntimeException('Root node must be an instance of ArrayNodeDefinition');
+        }
 
         $rootNode
             ->children()
