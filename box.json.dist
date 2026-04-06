@@ -1,0 +1,29 @@
+{
+    "chmod": "0755",
+    "compactors": [
+        "KevinGH\\Box\\Compactor\\Php"
+    ],
+    "directories": [
+        "src"
+    ],
+    "files": [
+        "LICENSE"
+    ],
+    "finder": [
+        {
+            "name": "*.php",
+            "exclude": [
+                "tests",
+                "Tests",
+                "phpunit",
+                "phpstan",
+                "php-codesniffer"
+            ],
+            "in": "vendor"
+        }
+    ],
+    "git-version": "git-version",
+    "main": "bin/agentchk",
+    "output": "agentchk.phar",
+    "stub": true
+}

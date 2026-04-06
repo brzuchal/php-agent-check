@@ -10,6 +10,22 @@ This project provides a wrapper/runner around common testing tools (PHPUnit, PHP
 
 ## Installation
 
+### PHAR (recommended)
+
+You can download the latest version as a single PHAR file:
+
+```bash
+sudo curl -Ls https://github.com/brzuchal/php-agent-check/releases/latest/download/agentchk.phar -o /usr/local/bin/agentchk && sudo chmod +x /usr/local/bin/agentchk
+```
+
+### Composer Global
+
+```bash
+composer global require brzuchal/php-agent-check
+```
+
+### Local Composer (Dev dependency)
+
 ```bash
 composer require --dev brzuchal/php-agent-check
 ```
