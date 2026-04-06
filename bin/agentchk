@@ -3,7 +3,7 @@
 
 $files = [
     __DIR__ . '/../vendor/autoload.php',
-    __DIR__ . '/../../../autoload.php',
+    __DIR__ . '/../../../../autoload.php',
     __DIR__ . '/vendor/autoload.php',
 ];
 $autoloadResult = false;
@@ -78,7 +78,7 @@ $agentCheck = new AgentCheck(
     $reporters
 );
 
-$application = new Application('AgentCheck', '1.1.0');
+$application = new Application('AgentCheck', '0.1.0');
 $application->add(new CheckCommand($agentCheck));
 $application->add(new InitCommand($detectors));
 $application->setDefaultCommand('check', false);
