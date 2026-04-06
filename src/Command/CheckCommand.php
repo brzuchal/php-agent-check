@@ -29,15 +29,6 @@ final class CheckCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         try {
-            $modeOpt = $input->getOption('mode');
-            $envMode = getenv('AGENTCHK_MODE');
-            if ($envMode !== false) {
-                $modeOpt = $envMode === '1' ? 'agent' : $envMode;
-            } elseif (getenv('AGENT_MODE') === '1') {
-                $modeOpt = 'agent';
-            }
-            $mode = ExecutionMode::tryFrom($modeOpt) ?? ExecutionMode::Human;
-
             $profile = Profile::from($input->getOption('profile'));
         } catch (\Throwable $e) {
             $output->writeln("<error>Invalid Configuration: " . $e->getMessage() . "</error>");

@@ -8,7 +8,7 @@ use Brzuchal\PhpAgentCheck\Domain\Issue;
 use Brzuchal\PhpAgentCheck\Domain\Severity;
 use Brzuchal\PhpAgentCheck\Domain\ToolStatus;
 
-final class PhpCsJsonParser
+final readonly class PhpCsJsonParser
 {
     public function parse(CheckExecutionResult $result): CheckResult
     {

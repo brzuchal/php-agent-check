@@ -8,9 +8,9 @@ use Brzuchal\PhpAgentCheck\Domain\CheckExecutionResult;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Console\Output\OutputInterface;
 
-final class SymfonyProcessRunner implements ProcessRunner
+final readonly class SymfonyProcessRunner implements ProcessRunner
 {
-    public function __construct(private readonly ?OutputInterface $output = null)
+    public function __construct(private ?OutputInterface $output = null)
     {
     }
 

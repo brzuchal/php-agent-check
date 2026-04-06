@@ -2,6 +2,7 @@
 
 namespace Brzuchal\PhpAgentCheck\Infrastructure\Config;
 
+use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
@@ -10,9 +11,9 @@ final class ConfigurationDefinition implements ConfigurationInterface
     public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder('agentchk');
-        /** @var \Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition $rootNode */
+        /** @var ArrayNodeDefinition $rootNode */
         $rootNode = $treeBuilder->getRootNode();
-        if (!$rootNode instanceof \Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition) {
+        if (!$rootNode instanceof ArrayNodeDefinition) {
             throw new \RuntimeException('Root node must be an instance of ArrayNodeDefinition');
         }
 

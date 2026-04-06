@@ -9,19 +9,19 @@ use Brzuchal\PhpAgentCheck\Domain\ToolConfig;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Yaml\Yaml;
 
-final class YamlConfigurationLoader implements ConfigurationLoader
+final readonly class YamlConfigurationLoader implements ConfigurationLoader
 {
+    public const CONFIGURATION_FILENAMES = [
+        'agentchk.yaml',
+        'agentchk.yml',
+        'agentchk.dist.yaml',
+        'agentchk.dist.yml',
+    ];
+
     public function load(?string $workingDirectory = null): ProjectConfiguration
     {
-        $candidates = [
-            'agentchk.yaml',
-            'agentchk.yml',
-            'agentchk.dist.yaml',
-            'agentchk.dist.yml',
-        ];
-
         $dir = $workingDirectory ?? getcwd();
-        foreach ($candidates as $candidate) {
+        foreach (self::CONFIGURATION_FILENAMES as $candidate) {
             $path = $dir . DIRECTORY_SEPARATOR . $candidate;
             if (file_exists($path)) {
                 $data = Yaml::parseFile($path);
@@ -32,7 +32,9 @@ final class YamlConfigurationLoader implements ConfigurationLoader
             }
         }
 
-        throw new \RuntimeException("No configuration file found. Looked for: " . implode(', ', $candidates));
+        throw new \RuntimeException(
+            "No configuration file found. Looked for: " . implode(', ', self::CONFIGURATION_FILENAMES)
+        );
     }
 
     public function dump(ProjectConfiguration $config): string

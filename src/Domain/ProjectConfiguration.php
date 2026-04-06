@@ -2,15 +2,15 @@
 
 namespace Brzuchal\PhpAgentCheck\Domain;
 
-final class ProjectConfiguration
+final readonly class ProjectConfiguration
 {
     /**
      * @param ProfileDefinition[] $profiles
      * @param ToolConfig[] $tools
      */
     public function __construct(
-        public readonly array $profiles,
-        public readonly array $tools
+        public array $profiles,
+        public array $tools
     ) {
     }
 
