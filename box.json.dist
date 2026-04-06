@@ -6,12 +6,9 @@
     "directories": [
         "src"
     ],
-    "files": [
-        "LICENSE"
-    ],
+    "files": [],
     "finder": [
         {
-            "name": "*.php",
             "exclude": [
                 "tests",
                 "Tests",
