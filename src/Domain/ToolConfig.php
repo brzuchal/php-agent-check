@@ -2,12 +2,12 @@
 
 namespace Brzuchal\PhpAgentCheck\Domain;
 
-final class ToolConfig
+readonly final class ToolConfig
 {
     public function __construct(
-        public readonly string $name,
-        public readonly array $command = [],
-        public readonly array $args = []
+        public string $name,
+        public array $command = [],
+        public array $args = []
     ) {
     }
 

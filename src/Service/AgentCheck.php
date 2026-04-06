@@ -6,15 +6,15 @@ use Brzuchal\PhpAgentCheck\Domain\Check;
 use Brzuchal\PhpAgentCheck\Domain\CheckContext;
 use Brzuchal\PhpAgentCheck\Domain\Report;
 
-final class AgentCheck
+readonly final class AgentCheck
 {
     public function __construct(
-        private readonly ConfigurationLoader $configLoader,
-        private readonly ProcessRunner $processRunner,
+        private ConfigurationLoader $configLoader,
+        private ProcessRunner $processRunner,
         /** @var iterable<Check> */
-        private readonly iterable $checks,
+        private iterable $checks,
         /** @var iterable<ReportWriter> */
-        private readonly iterable $reporters
+        private iterable $reporters
     ) {
     }
 

@@ -3,7 +3,9 @@
     "compactors": [
         "KevinGH\\Box\\Compactor\\Php"
     ],
-    "check-requirements": false,
+    "check-requirements": {
+        "php": "^8.2"
+    },
     "directories": [
         "src"
     ],

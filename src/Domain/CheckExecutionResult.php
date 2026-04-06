@@ -2,12 +2,12 @@
 
 namespace Brzuchal\PhpAgentCheck\Domain;
 
-final class CheckExecutionResult
+readonly final class CheckExecutionResult
 {
     public function __construct(
-        public readonly int $exitCode,
-        public readonly string $stdout,
-        public readonly string $stderr
+        public int $exitCode,
+        public string $stdout,
+        public string $stderr
     ) {
     }
 

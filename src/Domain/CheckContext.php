@@ -2,11 +2,11 @@
 
 namespace Brzuchal\PhpAgentCheck\Domain;
 
-final class CheckContext
+readonly final class CheckContext
 {
     public function __construct(
-        public readonly ToolConfig $config,
-        public readonly string $workingDirectory
+        public ToolConfig $config,
+        public string $workingDirectory
     ) {
     }
 }

@@ -2,13 +2,13 @@
 
 namespace Brzuchal\PhpAgentCheck\Domain;
 
-final class CheckExecution
+readonly final class CheckExecution
 {
     public function __construct(
-        public readonly array $command,
-        public readonly string $workingDirectory,
-        public readonly array $environmentVariables = [],
-        public readonly int $timeout = 300
+        public array $command,
+        public string $workingDirectory,
+        public array $environmentVariables = [],
+        public int $timeout = 300
     ) {
     }
 }

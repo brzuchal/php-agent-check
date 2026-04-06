@@ -8,9 +8,9 @@ use Brzuchal\PhpAgentCheck\Domain\CheckExecution;
 use Brzuchal\PhpAgentCheck\Domain\CheckExecutionResult;
 use Brzuchal\PhpAgentCheck\Domain\CheckResult;
 
-final class PhpCsCheck implements Check
+readonly final class PhpCsCheck implements Check
 {
-    public function __construct(private readonly PhpCsJsonParser $parser)
+    public function __construct(private PhpCsJsonParser $parser)
     {
     }
 

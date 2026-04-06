@@ -2,13 +2,13 @@
 
 namespace Brzuchal\PhpAgentCheck\Domain;
 
-final class CheckResult implements \JsonSerializable
+readonly final class CheckResult implements \JsonSerializable
 {
     public function __construct(
-        public readonly string $tool,
-        public readonly ToolStatus $status,
+        public string $tool,
+        public ToolStatus $status,
         /** @var list<Issue> */
-        public readonly array $issues = []
+        public array $issues = []
     ) {
     }
 
