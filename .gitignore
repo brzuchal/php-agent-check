@@ -3,3 +3,5 @@
 /.phpunit.cache/
 /.idea/
 .DS_Store
+.output.txt
+agentchk.phar
